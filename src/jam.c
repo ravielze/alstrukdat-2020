@@ -15,10 +15,11 @@ JAM MakeJAM (int HH, int MM, int SS){
 
 void BacaJAM (JAM * J){
     int H, M, S;
-    do
-    {
+    scanf("%d %d %d", &H, &M, &S);
+    while(!IsJAMValid(H, M, S)){
+        printf("Jam tidak valid\n");
         scanf("%d %d %d", &H, &M, &S);
-    } while (!IsJAMValid(H, M, S));
+    }
     *J = MakeJAM(H, M, S);
 }
 
@@ -35,23 +36,19 @@ JAM DetikToJAM (long N){
 }
 
 boolean JEQ (JAM J1, JAM J2){
-    return ((J1.HH == J2.HH) && (J1.MM == J2.MM) && (J1.SS == J2.SS));
+    return(JAMToDetik(J1) == JAMToDetik(J2));
 }
 
 boolean JNEQ (JAM J1, JAM J2){
-    return JEQ(J1, J2) == false;
+    return(JAMToDetik(J1) != JAMToDetik(J2));
 }
 
 boolean JLT (JAM J1, JAM J2){
-    if (J1.HH < J2.HH) return true;
-    if (J1.MM < J2.MM) return true;
-    if (J1.SS < J2.SS) return true;
-
-    return false;
+    return(JAMToDetik(J1) < JAMToDetik(J2));
 }
 
 boolean JGT (JAM J1, JAM J2){
-    return (JLT(J1, J2) == false);
+    return(JAMToDetik(J1) > JAMToDetik(J2));
 }
 
 JAM NextNDetik (JAM J, int N){
@@ -63,7 +60,7 @@ JAM NextDetik (JAM J){
 }
 
 JAM PrevNDetik (JAM J, int N){
-    return DetikToJAM(JAMToDetik(J) - (1L*N));
+    return DetikToJAM(JAMToDetik(J) - (1L*N) + 86400L);
 }
 
 JAM PrevDetik (JAM J){
@@ -71,8 +68,5 @@ JAM PrevDetik (JAM J){
 }
 
 long Durasi (JAM JAw, JAM JAkh){
-    long awal = JAMToDetik(JAw);
-    long akhir = JAMToDetik(JAkh);
-    if (awal > akhir) awal += 86400L;
-    return (akhir-awal);
+    return((JAMToDetik(JAkh)-JAMToDetik(JAw)+86400)%86400);
 }

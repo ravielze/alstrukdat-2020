@@ -16,23 +16,23 @@ void BacaPOINT (POINT * P) {
 }
 
 void TulisPOINT (POINT P){
-    printf("(%.2f, %.2f)", P.X, P.Y);
+    printf("(%.2f,%.2f)\n", P.X, P.Y);
 }
 
 boolean EQ (POINT p1, POINT p2){
-    return (p1.X == p2.X) && (p1.Y == p2.Y);
+    return ((p1.X == p2.X) && (p1.Y == p2.Y));
 }
 
 boolean NEQ (POINT p1, POINT p2){
-    return EQ(p1,p2) == false;
+    return (!EQ(p1,p2));
 }
 
 boolean IsOnSbX (POINT P){
-    return (P.Y == 0.0f);
+    return (P.Y == 0);
 }
 
 boolean IsOnSbY (POINT P){
-    return (P.X == 0.0f);
+    return (P.X == 0);
 }
 
 boolean IsOrigin (POINT P){
@@ -50,7 +50,7 @@ int Kuadran (POINT p){
 
 POINT NextX (POINT P){
     POINT result;
-    result.X = P.X + 1.0f;
+    result.X = P.X + 1;
     result.Y = P.Y;
     return result;
 }
@@ -58,7 +58,7 @@ POINT NextX (POINT P){
 POINT NextY (POINT P){
     POINT result;
     result.X = P.X;
-    result.Y = P.Y + 1.0f;
+    result.Y = P.Y + 1;
     return result;
 }
 
@@ -81,7 +81,7 @@ float Jarak0 (POINT P){
 }
 
 float Panjang (POINT P1, POINT P2){
-    return (sqrt(pow((P1.X-P2.X),2) + pow((P1.Y-P2.Y),2)));
+    return Jarak0(PlusDelta(P2, -Absis(P1), -Ordinat(P1)));
 }
 
 void Geser (POINT *P, float deltaX, float deltaY){
@@ -102,7 +102,9 @@ void Mirror (POINT *P, boolean SbX){
     P->Y = (SbX) ? -1*(P->Y) : P->Y;
 }
 
-void Putar (POINT *P, float Sudut){
-    P->X = (cos(Sudut)*(P->X))-(sin(Sudut)*(P->Y));
-    P->Y = (sin(Sudut)*(P->X))+(cos(Sudut)*(P->Y));
+void Putar (POINT *P, float s){
+    float Sudut = -(s/180)*acos(-1);
+    float x = P->X, y = P->Y;
+    P->X = (cos(Sudut)*x)-(sin(Sudut)*y);
+    P->Y = (sin(Sudut)*x)+(cos(Sudut)*y);
 }
