@@ -16,7 +16,7 @@ void BacaPOINT (POINT * P) {
 }
 
 void TulisPOINT (POINT P){
-    printf("(%.2f,%.2f)\n", P.X, P.Y);
+    printf("(%.2f,%.2f)", P.X, P.Y);
 }
 
 boolean EQ (POINT p1, POINT p2){
