@@ -54,7 +54,7 @@ START_TEST(MaxNbEl_TC1) {
 // Output: IdxMax
   TabInt T1;
   MakeEmpty(&T1);
-  ck_assert_int_eq(IdxMax, MaxNbEl(T1));
+  ck_assert_int_eq((IdxMax + 1), MaxNbEl(T1));
 } END_TEST
 
 START_TEST(GetFirstIdx_TC1) {
@@ -67,10 +67,10 @@ START_TEST(GetFirstIdx_TC1) {
 
 START_TEST(GetLastIdx_TC1) {
 // Input: T berisi 3 elemen
-// Output: 3
+// Output: 2
   TabInt T1;
   IsiTabel(&T1);
-  ck_assert_int_eq(3, GetLastIdx(T1));
+  ck_assert_int_eq(2, GetLastIdx(T1));
 } END_TEST
 
 START_TEST(IsIdxValid_TC1) {
@@ -92,7 +92,7 @@ START_TEST(IsIdxEff_TC1) {
 // Output: true
   TabInt T1;
   IsiTabel(&T1);
-  ck_assert_int_eq(true, IsIdxEff(T1, 3));
+  ck_assert_int_eq(true, IsIdxEff(T1, 2));
 } END_TEST
 
 START_TEST(IsIdxEff_TC2) {
@@ -174,7 +174,7 @@ START_TEST(PlusMinusTab_TC3) {
   int i;
   
   for(i = GetFirstIdx(TResult); i <= GetLastIdx(TResult); i++) {
-    ck_assert_int_eq(i, Elmt(TResult, i));
+    ck_assert_int_eq(i + 1, Elmt(TResult, i));
   }
 } END_TEST
 
@@ -203,7 +203,7 @@ START_TEST(Search1_TC1) {
 // Output: Index elemen tersebut
   TabInt T1;
   IsiTabel(&T1);
-  ck_assert_int_eq(1, Search1(T1, 1));
+  ck_assert_int_eq(0, Search1(T1, 1));
 } END_TEST
 
 START_TEST(Search1_TC2) {
@@ -337,7 +337,7 @@ START_TEST(Sort_TC1) {
   IsiTabelAcak(&T1);
   Sort(&T1, true);
   for (i = GetFirstIdx(T1); i <= GetLastIdx(T1); i++) {
-    ck_assert_int_eq(i, Elmt(T1, i));
+    ck_assert_int_eq(i + 1, Elmt(T1, i));
   }
 } END_TEST
 
@@ -349,7 +349,7 @@ START_TEST(Sort_TC2) {
   IsiTabelAcak(&T1);
   Sort(&T1, false);
   for (i = GetFirstIdx(T1); i <= GetLastIdx(T1); i++) {
-    ck_assert_int_eq(GetLastIdx(T1) - i + GetFirstIdx(T1), Elmt(T1, i));
+    ck_assert_int_eq(GetLastIdx(T1) - i + 1, Elmt(T1, i));
   }
 } END_TEST
 
@@ -367,7 +367,7 @@ START_TEST(AddAsLastEl_TC1) {
 
   ck_assert_int_eq(lastIdx + 1, GetLastIdx(T1));
   for (i = firstIdx; i <= (lastIdx + 1); i++) {
-    ck_assert_int_eq(i, Elmt(T1, i));
+    ck_assert_int_eq(i + 1, Elmt(T1, i));
   }
 } END_TEST
 
@@ -384,7 +384,7 @@ START_TEST(DelLastEl_TC1) {
 
   ck_assert_int_eq(lastIdx - 1, GetLastIdx(T1));
   for (i = firstIdx; i <= (lastIdx - 1); i++) {
-    ck_assert_int_eq(i, Elmt(T1, i));
+    ck_assert_int_eq(i + 1, Elmt(T1, i));
   }
   ck_assert_int_eq(3, X);
 } END_TEST
@@ -516,6 +516,6 @@ void IsiTabelPenuh(TabInt *T) {
   MakeEmpty(T);
   int i;
   for (i = IdxMin; i <= IdxMax; i++) {
-    Elmt(*T, i) = i;
+    Elmt(*T, i) = i + 1;
   }
 }

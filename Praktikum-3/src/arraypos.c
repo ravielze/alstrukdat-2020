@@ -5,6 +5,7 @@ void MakeEmpty (TabInt * T){
     int i;
     for(i=IdxMin; i <= IdxMax; i++)
         T->TI[i] = ValUndef;
+    return;
 }
 
 int MaxNbEl (TabInt T){
@@ -75,6 +76,7 @@ void BacaIsi (TabInt * T){
         }
     }
 
+    return;
 }
 
 void TulisIsiTab (TabInt T){
@@ -88,6 +90,7 @@ void TulisIsiTab (TabInt T){
         }
     }
     printf("]");
+    return;
 }
 
 TabInt PlusMinusTab (TabInt T1, TabInt T2, boolean plus){
@@ -96,9 +99,9 @@ TabInt PlusMinusTab (TabInt T1, TabInt T2, boolean plus){
     int i;
     for(i=GetFirstIdx(T1); i <= GetLastIdx(T1); i++){
         if (plus){
-            Elmt(result, i) = Elmt(T1, i) + Elmt(T2, i);
+            Elmt(result, i) = (Elmt(T1, i) != ValUndef ? Elmt(T1, i) : 0)+(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
         } else {
-            Elmt(result, i) = Elmt(T1, i) - Elmt(T2, i);
+            Elmt(result, i) = (Elmt(T1, i) != ValUndef ? Elmt(T1, i) : 0)-(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
         }
     }
     return result;
@@ -146,35 +149,66 @@ void MaxMin (TabInt T, ElType * Max, ElType * Min){
     }
     *Max = nmax;
     *Min = nmin;
+    return;
 }
 
-ElType SumTab (TabInt T);
-/* Menghasilkan hasil penjumlahan semua elemen T */
-/* Jika T kosong menghasilkan 0 */
-int CountX (TabInt T, ElType X);
-/* Menghasilkan berapa banyak kemunculan X di T */
-/* Jika T kosong menghasilkan 0 */
-boolean IsAllGenap (TabInt T);
-/* Menghailkan true jika semua elemen T genap */
+ElType SumTab (TabInt T){
+    if (IsEmpty(T)) return 0;
 
-/* ********** SORTING ********** */
-void Sort (TabInt * T, boolean asc);
-/* I.S. T boleh kosong */
-/* F.S. Jika asc = true, T terurut membesar */
-/*      Jika asc = false, T terurut mengecil */
-/* Proses : Mengurutkan T dengan salah satu algoritma sorting,
-   algoritma bebas */
+    int i,sum;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++) sum += Elmt(T,i);
+    return sum;
+}
 
-/* ********** MENAMBAH DAN MENGHAPUS ELEMEN DI AKHIR ********** */
-/* *** Menambahkan elemen terakhir *** */
-void AddAsLastEl (TabInt * T, ElType X);
-/* Proses: Menambahkan X sebagai elemen terakhir tabel */
-/* I.S. Tabel T boleh kosong, tetapi tidak penuh */
-/* F.S. X adalah elemen terakhir T yang baru */
-/* ********** MENGHAPUS ELEMEN ********** */
-void DelLastEl (TabInt * T, ElType * X);
-/* Proses : Menghapus elemen terakhir tabel */
-/* I.S. Tabel tidak kosong */
-/* F.S. X adalah nilai elemen terakhir T sebelum penghapusan, */
-/*      Banyaknya elemen tabel berkurang satu */
-/*      Tabel T mungkin menjadi kosong */
+int CountX (TabInt T, ElType X){
+    if (IsEmpty(T)) return 0;
+
+    int i,count=0;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        if(Elmt(T,i) == X) count += 1; 
+    };
+    return count;
+}
+
+boolean IsAllGenap (TabInt T){
+    boolean genap = true;
+    int i;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        if (Elmt(T, i) % 2 != 0){
+            genap = false;
+            break;
+        } 
+    }
+    return genap;
+    }
+
+void Sort (TabInt * T, boolean asc){
+    int i, j, n = NbElmt(*T);
+
+    for (i = 0; i < n-1; i++){
+        for (j = 0; j < n-i-1; j++){
+            if (((T->TI[j] > T->TI[j+1]) && asc == true) ||
+               ((T->TI[j] < T->TI[j+1]) && asc == false)) {
+                int temp = T->TI[j];
+                T->TI[j] = T->TI[j+1];
+                T->TI[j+1] = temp;
+            }
+        }
+    }
+    return;
+}
+
+void AddAsLastEl (TabInt * T, ElType X){
+    if (IsFull(*T)) return;
+
+    T->TI[GetLastIdx(*T)+1] = X;
+    return;
+}
+
+void DelLastEl (TabInt * T, ElType * X){
+    if (IsEmpty(*T)) return;
+
+    (*X) = T->TI[GetLastIdx(*T)];
+    T->TI[GetLastIdx(*T)] = IdxUndef;
+    return;
+}

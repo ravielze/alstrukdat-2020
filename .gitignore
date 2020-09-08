@@ -3,3 +3,5 @@
 *.gcno
 *.exe
 test
+check_*
+*.gcda
