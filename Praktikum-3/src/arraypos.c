@@ -1,4 +1,5 @@
 #include "arraypos.h"
+#include "boolean.h"
 #include <stdio.h>
 
 void MakeEmpty (TabInt * T){
