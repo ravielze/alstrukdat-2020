@@ -1,4 +1,5 @@
 #include "arraypos.h"
+#include <stdio.h>
 
 void MakeEmpty (TabInt * T){
     int i;
@@ -58,66 +59,95 @@ boolean IsFull (TabInt T){
 
 void BacaIsi (TabInt * T){
 
-    int N=0, input;
+    MakeEmpty(T);
+    
+    int N=0;
     while (true){
         scanf("%d", &N);
         if (IsIdxValid(*T,N)) break;
+        //Karena IsIdxValid(T) merupakan subset dari MaxNbEl(T)
     }
 
-    int i=IdxMin;
-    //NOT FINISHED
+    if (N > 0){
+        int i=IdxMin;
+        for(i=IdxMin;i < N; i++){
+            scanf("%d", &(T->TI[i]));
+        }
+    }
 
 }
-/* I.S. T sembarang */
-/* F.S. Tabel T terdefinisi */
-/* Proses : membaca banyaknya elemen T dan mengisi nilainya */
-/* 1. Baca banyaknya elemen diakhiri enter, misalnya N */
-/*    Pembacaan diulangi sampai didapat N yang benar yaitu 0 <= N <= MaxNbEl(T) */
-/*    Jika N tidak valid, tidak diberikan pesan kesalahan */
-/* 2. Jika 0 < N <= MaxNbEl(T); Lakukan N kali: Baca elemen mulai dari indeks 
-      IdxMin satu per satu diakhiri enter */
-/*    Jika N = 0; hanya terbentuk T kosong */
-void TulisIsiTab (TabInt T);
-/* Proses : Menuliskan isi tabel dengan traversal, tabel ditulis di antara kurung siku; 
-   antara dua elemen dipisahkan dengan separator "koma", tanpa tambahan karakter di depan,
-   di tengah, atau di belakang, termasuk spasi dan enter */
-/* I.S. T boleh kosong */
-/* F.S. Jika T tidak kosong: [e1,e2,...,en] */
-/* Contoh : jika ada tiga elemen bernilai 1, 20, 30 akan dicetak: [1,20,30] */
-/* Jika tabel kosong : menulis [] */
 
-/* ********** OPERATOR ARITMATIKA ********** */
-/* *** Aritmatika tabel : Penjumlahan, pengurangan, perkalian, ... *** */
-TabInt PlusMinusTab (TabInt T1, TabInt T2, boolean plus);
-/* Prekondisi : T1 dan T2 berukuran sama dan tidak kosong */
-/* Jika plus = true, mengirimkan  T1+T2, yaitu setiap elemen T1 dan T2 pada indeks yang sama dijumlahkan */
-/* Jika plus = false, mengirimkan T1-T2, yaitu setiap elemen T1 dikurangi elemen T2 pada indeks yang sama */
+void TulisIsiTab (TabInt T){
+    printf("[");
+    if (!IsEmpty(T)){
+        int i;
+        for (i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+            printf("%d", T.TI[i]);
+            
+            if (i != GetLastIdx(T)) printf(",");
+        }
+    }
+    printf("]");
+}
 
-/* ********** OPERATOR RELASIONAL ********** */
-/* *** Operasi pembandingan tabel : < =, > *** */
-boolean IsEQ (TabInt T1, TabInt T2);
-/* Mengirimkan true jika T1 sama dengan T2 yaitu jika ukuran T1 = T2 dan semua elemennya sama */
+TabInt PlusMinusTab (TabInt T1, TabInt T2, boolean plus){
+    TabInt result;
+    MakeEmpty(&result);
+    int i;
+    for(i=GetFirstIdx(T1); i <= GetLastIdx(T1); i++){
+        if (plus){
+            Elmt(result, i) = Elmt(T1, i) + Elmt(T2, i);
+        } else {
+            Elmt(result, i) = Elmt(T1, i) - Elmt(T2, i);
+        }
+    }
+    return result;
+}
 
-/* ********** SEARCHING ********** */
-/* ***  Perhatian : Tabel boleh kosong!! *** */
-IdxType Search1 (TabInt T, ElType X);
-/* Search apakah ada elemen tabel T yang bernilai X */
-/* Jika ada, menghasilkan indeks i terkecil, dengan elemen ke-i = X */
-/* Jika tidak ada, mengirimkan IdxUndef */
-/* Menghasilkan indeks tak terdefinisi (IdxUndef) jika tabel T kosong */
-/* Skema Searching yang digunakan bebas */
-boolean SearchB (TabInt T, ElType X);
-/* Search apakah ada elemen tabel T yang bernilai X */
-/* Jika ada, menghasilkan true, jika tidak ada menghasilkan false */
-/* Skema searching yang digunakan bebas */
+boolean IsEQ (TabInt T1, TabInt T2){
+    boolean result = true;
+    int i;
+    for(i=GetFirstIdx(T1); i <= GetLastIdx(T1); i++){
+        if (Elmt(T1, i) != Elmt(T2, i)){
+            result = false;
+            break;
+        }
+    }
+    return result;
+}
 
-/* ********** NILAI EKSTREM ********** */
-void MaxMin (TabInt T, ElType * Max, ElType * Min);
-/* I.S. Tabel T tidak kosong */
-/* F.S. Max berisi nilai maksimum T;
-        Min berisi nilai minimum T */
+IdxType Search1 (TabInt T, ElType X){
+    if (IsEmpty(T)) return IdxUndef;
 
-/* ********** OPERASI LAIN ********** */
+    int i,result=IdxUndef;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        if (Elmt(T, i) == X){
+            result = i;
+            break;
+        } 
+    }
+    return result;
+}
+
+boolean SearchB (TabInt T, ElType X){
+    return Search1(T,X) != IdxUndef;
+}
+
+void MaxMin (TabInt T, ElType * Max, ElType * Min){
+    int nmax, nmin, i;
+    nmin = Elmt(T, GetFirstIdx(T));
+    nmax = Elmt(T, GetFirstIdx(T));
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        if (Elmt(T,i) > nmax){
+            nmax = Elmt(T,i);
+        } else if (Elmt(T,i) < nmin) {
+            nmin = Elmt(T,i);
+        }
+    }
+    *Max = nmax;
+    *Min = nmin;
+}
+
 ElType SumTab (TabInt T);
 /* Menghasilkan hasil penjumlahan semua elemen T */
 /* Jika T kosong menghasilkan 0 */
