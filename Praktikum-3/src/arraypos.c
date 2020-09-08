@@ -89,7 +89,7 @@ void TulisIsiTab (TabInt T){
             if (i != GetLastIdx(T)) printf(",");
         }
     }
-    printf("]");
+    printf("]\n");
     return;
 }
 
@@ -209,6 +209,6 @@ void DelLastEl (TabInt * T, ElType * X){
     if (IsEmpty(*T)) return;
 
     (*X) = T->TI[GetLastIdx(*T)];
-    T->TI[GetLastIdx(*T)] = IdxUndef;
+    T->TI[GetLastIdx(*T)] = ValUndef;
     return;
 }
