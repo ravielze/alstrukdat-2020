@@ -60,7 +60,6 @@ void BacaIsi (TabInt * T){
         if (N >= 0 && N <= MaxNbEl(*T)){
             break;
         }
-        //Karena IsIdxValid(T) merupakan subset dari MaxNbEl(T)
     }
 
     if (N > 0){
@@ -117,7 +116,9 @@ boolean IsEQ (TabInt T1, TabInt T2){
 }
 
 IdxType Search1 (TabInt T, ElType X){
-    if (IsEmpty(T)) return IdxUndef;
+    if (IsEmpty(T)){
+        return IdxUndef;
+    }
 
     int i,result=IdxUndef;
     for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
@@ -187,7 +188,7 @@ int CountX (TabInt T, ElType X){
 
 boolean IsAllGenap (TabInt T){
     boolean genap = true;
-    int i;
+    int i = GetFirstIdx(T);
     while(genap && i <= GetLastIdx(T)){
         genap = (genap & (Elmt(T,i)%2 == 0));
         i++;
