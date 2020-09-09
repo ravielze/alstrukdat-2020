@@ -1,46 +1,37 @@
+#include <stdio.h>
 #include "arraypos.h"
 #include "boolean.h"
-#include <stdio.h>
 
 void MakeEmpty (TabInt * T){
-    int i;
-    for(i=IdxMin; i <= IdxMax; i++)
+    IdxType i;
+    for(i=IdxMin; i <= IdxMax; i++){
         T->TI[i] = ValUndef;
+    }
     return;
 }
 
-int MaxNbEl (TabInt T){
-    int i, count=0;
+int NbElmt (TabInt T){
+    IdxType i, count=0;
     for(i=IdxMin; i < IdxMax+1; i++){
-        if (T.TI[i] == ValUndef) count++;
+        if (T.TI[i] != ValUndef){
+            count++;
+        } else {
+            break;
+        }
     }
-    return count;
+    return count - IdxMin;
 }
 
-int NbElmt (TabInt T){
-    return IdxMax+1-MaxNbEl(T);
+int MaxNbEl (TabInt T){
+    return (IdxMax-IdxMin+1);
 }
 
 IdxType GetFirstIdx (TabInt T){
-    int index=IdxUndef,i;
-    for(i=IdxMin; i < IdxMax+1; i++){
-        if (T.TI[i] != ValUndef){
-            index = i;
-            break;
-        }
-    }
-    return index;
+    return IdxMin;
 }
 
 IdxType GetLastIdx (TabInt T){
-    int index=IdxUndef,i;
-    for(i=IdxMax; i >= IdxMin; i--){
-        if (T.TI[i] != ValUndef){
-            index = i;
-            break;
-        }
-    }
-    return index;
+    return IdxMin+NbElmt(T)-1;
 }
 
 boolean IsIdxValid (TabInt T, IdxType i){
@@ -52,28 +43,30 @@ boolean IsIdxEff (TabInt T, IdxType i){
 }
 
 boolean IsEmpty (TabInt T){
-    return (GetFirstIdx(T) == IdxUndef && GetLastIdx(T) == IdxUndef);
+    return (NbElmt(T) == 0);
 }
 
 boolean IsFull (TabInt T){
-    return (GetFirstIdx(T) == IdxMin && GetLastIdx(T) == IdxMax);
+    return (NbElmt(T) == MaxNbEl(T));
 }
 
 void BacaIsi (TabInt * T){
 
     MakeEmpty(T);
     
-    int N=0;
+    int N;
     while (true){
-        scanf("%d", &N);
-        if (IsIdxValid(*T,N)) break;
+        scanf("%d\n", &N);
+        if (N >= 0 && N <= MaxNbEl(*T)){
+            break;
+        }
         //Karena IsIdxValid(T) merupakan subset dari MaxNbEl(T)
     }
 
     if (N > 0){
         int i=IdxMin;
         for(i=IdxMin;i < N; i++){
-            scanf("%d", &(T->TI[i]));
+            scanf("%d\n", &(T->TI[i]));
         }
     }
 
@@ -87,10 +80,12 @@ void TulisIsiTab (TabInt T){
         for (i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
             printf("%d", T.TI[i]);
             
-            if (i != GetLastIdx(T)) printf(",");
+            if (i != GetLastIdx(T)){
+                printf(",");
+            }
         }
     }
-    printf("]\n");
+    printf("]");
     return;
 }
 
@@ -100,22 +95,23 @@ TabInt PlusMinusTab (TabInt T1, TabInt T2, boolean plus){
     int i;
     for(i=GetFirstIdx(T1); i <= GetLastIdx(T1); i++){
         if (plus){
-            Elmt(result, i) = (Elmt(T1, i) != ValUndef ? Elmt(T1, i) : 0)+(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
+            Elmt(result, i) = Elmt(T1, i)+(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
         } else {
-            Elmt(result, i) = (Elmt(T1, i) != ValUndef ? Elmt(T1, i) : 0)-(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
+            Elmt(result, i) = Elmt(T1, i)-(Elmt(T2, i) != ValUndef ? Elmt(T2, i) : 0);
         }
     }
     return result;
 }
 
 boolean IsEQ (TabInt T1, TabInt T2){
-    boolean result = true;
+    if (NbElmt(T1) != NbElmt(T2)){
+        return false;
+    }
+
+    boolean result = (NbElmt(T1) == NbElmt(T2));
     int i;
     for(i=GetFirstIdx(T1); i <= GetLastIdx(T1); i++){
-        if (Elmt(T1, i) != Elmt(T2, i)){
-            result = false;
-            break;
-        }
+        result = result && (Elmt(T1, i) == Elmt(T2, i));
     }
     return result;
 }
@@ -134,7 +130,18 @@ IdxType Search1 (TabInt T, ElType X){
 }
 
 boolean SearchB (TabInt T, ElType X){
-    return Search1(T,X) != IdxUndef;
+    if (IsEmpty(T)){
+        return false;
+    }
+    boolean found = false;
+    int i;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        if (Elmt(T, i) == X){
+            found = true;
+            break;
+        } 
+    }
+    return found;
 }
 
 void MaxMin (TabInt T, ElType * Max, ElType * Min){
@@ -154,19 +161,26 @@ void MaxMin (TabInt T, ElType * Max, ElType * Min){
 }
 
 ElType SumTab (TabInt T){
-    if (IsEmpty(T)) return 0;
+    if (IsEmpty(T)){
+        return 0;
+    }
 
-    int i,sum;
-    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++) sum += Elmt(T,i);
+    int i,sum = 0;
+    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
+        sum += Elmt(T,i);
+    }
     return sum;
 }
 
 int CountX (TabInt T, ElType X){
-    if (IsEmpty(T)) return 0;
-
+    if (IsEmpty(T)){
+        return 0;
+    }
     int i,count=0;
     for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
-        if(Elmt(T,i) == X) count += 1; 
+        if(Elmt(T,i) == X){
+            count += 1; 
+        }
     };
     return count;
 }
@@ -174,42 +188,40 @@ int CountX (TabInt T, ElType X){
 boolean IsAllGenap (TabInt T){
     boolean genap = true;
     int i;
-    for(i=GetFirstIdx(T); i <= GetLastIdx(T); i++){
-        if (Elmt(T, i) % 2 != 0){
-            genap = false;
-            break;
-        } 
+    while(genap && i <= GetLastIdx(T)){
+        genap = (genap & (Elmt(T,i)%2 == 0));
+        i++;
     }
     return genap;
     }
 
 void Sort (TabInt * T, boolean asc){
-    int i, j, n = NbElmt(*T);
+    int i, j;
+    IdxType key;
 
-    for (i = 0; i < n-1; i++){
-        for (j = 0; j < n-i-1; j++){
-            if (((T->TI[j] > T->TI[j+1]) && asc == true) ||
-               ((T->TI[j] < T->TI[j+1]) && asc == false)) {
-                int temp = T->TI[j];
-                T->TI[j] = T->TI[j+1];
-                T->TI[j+1] = temp;
-            }
+    for (i = GetFirstIdx(*T) + 1; i <= GetLastIdx(*T); i++){
+        key = Elmt(*T, i);
+        j = i-1;
+        while (j >= GetFirstIdx(*T) && ((!asc && Elmt(*T,j) < key) || (asc && Elmt(*T,j) > key))){
+            Elmt(*T,j+1) = Elmt(*T, j);
+            j--;
         }
+        Elmt(*T,j+1) = key;
     }
     return;
 }
 
 void AddAsLastEl (TabInt * T, ElType X){
-    if (IsFull(*T)) return;
-
-    T->TI[GetLastIdx(*T)+1] = X;
+    if (!IsFull(*T)) {
+        T->TI[(GetLastIdx(*T)+1)] = X;
+    }
     return;
 }
 
 void DelLastEl (TabInt * T, ElType * X){
     if (IsEmpty(*T)) return;
 
-    (*X) = T->TI[GetLastIdx(*T)];
+    *X = T->TI[GetLastIdx(*T)];
     T->TI[GetLastIdx(*T)] = ValUndef;
     return;
 }
