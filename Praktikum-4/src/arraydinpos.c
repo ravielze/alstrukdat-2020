@@ -1,27 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "arraydin.h"
+#include "arraydinpos.h"
 #include "boolean.h"
 
 void MakeEmpty(TabInt *T, int maxel){
-    T->Neff = 0;
     T->MaxEl = maxel;
     T->TI = (int *) malloc(maxel * sizeof(int));
     IdxType i;
     for(i=IdxMin; i < maxel; i++){
-        T->TI[i] = 0;
+        T->TI[i] = ValUndef;
     }
     return;
 }
 
 void Dealokasi(TabInt *T){
-    T->Neff = 0;
     T->MaxEl = 0;
     free((T->TI));
 }
 
 int NbElmt(TabInt T){
-    return T.Neff;
+    int i=IdxMin;
+    while(i<T.MaxEl && T.TI[i]!=ValUndef){
+        i++;
+    }
+    return i;
 }
 
 int MaxElement(TabInt T){
@@ -33,7 +35,7 @@ IdxType GetFirstIdx(TabInt T){
 }
 
 IdxType GetLastIdx(TabInt T){
-    return T.Neff-1;
+    return NbElmt(T)-1;
 }
 
 boolean IsIdxValid(TabInt T, IdxType i){
@@ -41,15 +43,15 @@ boolean IsIdxValid(TabInt T, IdxType i){
 }
 
 boolean IsIdxEff(TabInt T, IdxType i){
-    return (i >= 0 && i < T.Neff);
+    return (i >= GetFirstIdx(T) && i <= GetLastIdx(T));
 }
 
 boolean IsEmpty(TabInt T){
-    return (T.Neff == 0);
+    return (NbElmt(T) == 0);
 }
 
 boolean IsFull(TabInt T){
-    return (T.Neff == T.MaxEl);
+    return (NbElmt(T) == T.MaxEl);
 }
 
 void BacaIsi(TabInt *T){
@@ -64,12 +66,9 @@ void BacaIsi(TabInt *T){
 
     if (N > 0){
         IdxType i;
-        T->Neff = N;
         for(i=GetFirstIdx(*T); i <= GetLastIdx(*T); i++){
             scanf("%d\n", &(T->TI[i]));
         }
-    } else if (N == 0){
-        T->Neff = 0;
     }
 
     return;
@@ -92,19 +91,24 @@ void TulisIsiTab(TabInt T){
 }
 
 TabInt PlusMinusTab(TabInt T1, TabInt T2, boolean plus){
+    if (NbElmt(T1) < NbElmt(T2)){
+        return PlusMinusTab(T2, T1, plus);
+    }
     TabInt T3;
     MakeEmpty(&T3, T1.MaxEl);
-    T3.Neff = T1.Neff;
     
     IdxType i;
     for(i=GetFirstIdx(T3); i <=GetLastIdx(T3); i++){
         T3.TI[i] = T1.TI[i] + (T2.TI[i] * (plus ? 1 : -1));
+        if ((!plus) && T3.TI[i] <= 0){
+            T3.TI[i] = T1.TI[i];
+        }
     }
     return T3;
 }
 
 boolean IsEQ(TabInt T1, TabInt T2){
-    boolean equal = (T1.Neff == T2.Neff);
+    boolean equal = (NbElmt(T1) == NbElmt(T2));
 
     IdxType i;
     for(i=GetFirstIdx(T1); i <=GetLastIdx(T1); i++){
@@ -166,7 +170,6 @@ void MaxMin(TabInt T, ElType *Max, ElType *Min){
 void CopyTab(TabInt Tin, TabInt *Tout){
     TabInt TResult;
     MakeEmpty(&TResult, Tin.MaxEl);
-    TResult.Neff = Tin.Neff;
 
     IdxType i;
     for(i=GetFirstIdx(Tin); i <= GetLastIdx(Tin); i++){
@@ -229,7 +232,6 @@ void Sort(TabInt *T, boolean asc){
 void AddAsLastEl(TabInt *T, ElType X){
     if (!IsFull(*T)) {
         T->TI[(GetLastIdx(*T)+1)] = X;
-        T->Neff += 1;
     }
     return;
 }
@@ -238,14 +240,13 @@ void DelLastEl(TabInt *T, ElType *X){
     if (IsEmpty(*T)) return;
 
     *X = T->TI[GetLastIdx(*T)];
-    T->Neff -= 1;
+    T->TI[GetLastIdx(*T)] = ValUndef;
     return;
 }
 
 void GrowTab(TabInt *T, int num){
     TabInt TNew;
     MakeEmpty(&TNew, ((T->MaxEl)+num));
-    TNew.Neff = T->Neff;
 
     IdxType i;
     for(i=GetFirstIdx(*T); i <= GetLastIdx(*T); i++){
@@ -257,9 +258,7 @@ void GrowTab(TabInt *T, int num){
 
 void ShrinkTab(TabInt *T, int num){
     TabInt TNew;
-    int shrinked = (T->MaxEl)-num;
-    MakeEmpty(&TNew, shrinked);
-    TNew.Neff = (T->Neff < shrinked ? T->Neff : shrinked);
+    MakeEmpty(&TNew, ((T->MaxEl)-num));
 
     IdxType i;
     for(i=GetFirstIdx(TNew); i <= GetLastIdx(TNew); i++){
@@ -271,8 +270,7 @@ void ShrinkTab(TabInt *T, int num){
 
 void CompactTab(TabInt *T){
     TabInt TNew;
-    MakeEmpty(&TNew, T->Neff);
-    TNew.Neff = T->Neff;
+    MakeEmpty(&TNew, NbElmt(*T));
 
     IdxType i;
     for(i=GetFirstIdx(TNew); i <= GetLastIdx(TNew); i++){
