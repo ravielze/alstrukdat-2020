@@ -102,9 +102,19 @@ MATRIKS KurangMATRIKS (MATRIKS M1, MATRIKS M2){
     return MR;
 }
 
-MATRIKS KaliMATRIKS (MATRIKS M1, MATRIKS M2);
-/* Prekondisi : Ukuran kolom efektif M1 = ukuran baris efektif M2 */
-/* Mengirim hasil perkalian matriks: salinan M1 * M2 */
+MATRIKS KaliMATRIKS (MATRIKS M1, MATRIKS M2){
+    MATRIKS M;
+    MakeMATRIKS(M1.NBrsEff, M1.NKolEff, &M);
+    int i, j, k;
+    for(i  = GetFirstIdxBrs(M1); i <= GetLastIdxBrs(M1); i++){
+        for(j = GetFirstIdxKol(M2); j <= GetLastIdxKol(M2); j++){
+            for(k = GetFirstIdxKol(M1); k <= GetLastIdxKol(M1); k++){
+                Elmt(M, i, j) += (Elmt(M1, i, k)*Elmt(M2, k, j));
+            }
+        }
+    }
+    return M;
+}
 
 MATRIKS KaliKons (MATRIKS M, ElType X){
     MATRIKS MR;
@@ -120,7 +130,8 @@ MATRIKS KaliKons (MATRIKS M, ElType X){
 }
 
 void PKaliKons (MATRIKS * M, ElType K){
-    *M = KaliKons(*M, K);
+    MATRIKS MNew = KaliKons(*M, K);
+    *M = MNew;
 }
 
 boolean EQ (MATRIKS M1, MATRIKS M2){
@@ -179,26 +190,74 @@ boolean IsSatuan (MATRIKS M){
 }
 
 boolean IsSparse (MATRIKS M){
-    int zero = 0,i,j;
+    int nonzero = 0,i,j;
 
     for (i = GetFirstIdxBrs(M); i <= GetLastIdxBrs(M); i++){
         for (j = GetFirstIdxKol(M); j <= GetLastIdxKol(M); j++){
-            zero += (M.Mem[i][j] == 0 ? 1 : 0);
+            nonzero += (M.Mem[i][j] == 0 ? 0 : 1);
         }
     }
 
-    return (((zero*100/(M.NBrsEff*M.NKolEff))/100) <= 5);
+    return (20*nonzero <= NBElmt(M));
 }
-/* Mengirimkan true jika M adalah matriks sparse: mariks “jarang” dengan definisi: 
-   hanya maksimal 5% dari memori matriks yang efektif bukan bernilai 0 */ 
-MATRIKS Inverse1 (MATRIKS M);
-/* Menghasilkan salinan M dengan setiap elemen "di-invers", yaitu dinegasikan (dikalikan -1) */
-float Determinan (MATRIKS M);
-/* Prekondisi: IsBujurSangkar(M) */
-/* Menghitung nilai determinan M */
-void PInverse1 (MATRIKS * M);
-/* I.S. M terdefinisi */
-/* F.S. M di-invers, yaitu setiap elemennya dinegasikan (dikalikan -1) */
+
+MATRIKS Inverse1 (MATRIKS M){
+    return KaliKons(M, -1);
+}
+
+float Determinan (MATRIKS M){
+    int size = NBrsEff(M);
+    float m[size][size];
+    int i, j;
+
+    for (i = 0; i < size; i++){
+        for (j = 0; j < size; j++){
+            m[i][j] = Elmt(M, i, j);
+        }
+    }
+
+    float temp, result = 1;
+    boolean swap;
+    int swapped = 0;
+
+    while (size > 0){
+        swap = false;
+        i = 0;
+        if (m[size-1][size-1] == 0){
+            while (i < (size-1) && !swap){
+                if (m[size-1][size-1] == 0){
+                    i++;
+                } else {
+                    swap = true;
+                }
+            }
+        }
+        if (i == (size-1) && (size > 1)){
+            return 0;
+        } else if (swap){
+            for(j = 0; j < size; j++){
+                temp = m[size-1][j];
+                m[size-1][j] = m[i][j];
+                m[i][j] = temp;
+            }
+        }
+        for (i = 0; i < (size-1); i++){
+            for(j=0; j<size; j++){
+                m[i][j] -= m[size-1][j]*(m[i][size-1]/m[size-1][size-1]);
+            }
+        }
+        result *= m[size-1][size-1];
+        swapped = (swapped+(swap ? 1 : 0))%2;
+        size--;
+    }
+    return (result*(swapped==0 ? 1 : -1));
+}
+
+void PInverse1 (MATRIKS * M){
+    MATRIKS MNew = Inverse1(*M);
+    *M = MNew;
+}
+
 void Transpose (MATRIKS * M){
     MATRIKS MNew;
     MakeMATRIKS(M->NBrsEff, M->NKolEff, &MNew);
@@ -212,5 +271,3 @@ void Transpose (MATRIKS * M){
 
     *M = MNew;
 }
-/* I.S. M terdefinisi dan IsBujursangkar(M) */
-/* F.S. M "di-transpose", yaitu setiap elemen M(i,j) ditukar nilainya dengan elemen M(j,i) */
