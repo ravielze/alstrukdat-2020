@@ -135,15 +135,13 @@ void PKaliKons (MATRIKS * M, ElType K){
 }
 
 boolean EQ (MATRIKS M1, MATRIKS M2){
-    boolean result = NBElmt(M1) == NBElmt(M2);
-    int i,j;
-    int baris1 = GetFirstIdxBrs(M1) >= GetFirstIdxBrs(M2) ? GetFirstIdxBrs(M1) : GetFirstIdxBrs(M2);
-    int baris2 = GetLastIdxBrs(M1) <= GetLastIdxBrs(M2) ? GetLastIdxBrs(M1) : GetLastIdxBrs(M2);
-    int kol1 = GetFirstIdxKol(M1) >= GetFirstIdxKol(M2) ? GetFirstIdxKol(M1) : GetFirstIdxKol(M2);
-    int kol2 = GetLastIdxKol(M1) <= GetLastIdxKol(M2) ? GetLastIdxKol(M1) : GetLastIdxKol(M2);
-    for (i = baris1; i <= baris2; i++){
-        for (j = kol1; j <= kol2; j++){
-            result = result && (M1.Mem[i][j] == M2.Mem[i][j]);
+    boolean result = (NBElmt(M1) == NBElmt(M2));
+    if (result){
+        int i,j;
+        for (i = GetFirstIdxBrs(M1); i <= GetLastIdxBrs(M1); i++){
+            for (j = GetFirstIdxKol(M1); j <= GetLastIdxKol(M1); j++){
+                result = result && (M1.Mem[i][j] == M2.Mem[i][j]);
+            }
         }
     }
     return result;
@@ -250,7 +248,7 @@ float Determinan (MATRIKS M){
         swapped = (swapped+(swap ? 1 : 0))%2;
         size--;
     }
-    return (result*(swapped==0 ? 1 : -1));
+    return (result*(swapped==0 ? 1.0f : -1.0f));
 }
 
 void PInverse1 (MATRIKS * M){
