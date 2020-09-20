@@ -104,9 +104,9 @@ MATRIKS KurangMATRIKS (MATRIKS M1, MATRIKS M2){
 
 MATRIKS KaliMATRIKS (MATRIKS M1, MATRIKS M2){
     MATRIKS M;
-    MakeMATRIKS(M1.NBrsEff, M1.NKolEff, &M);
+    MakeMATRIKS(M1.NBrsEff, M2.NKolEff, &M);
     int i, j, k;
-    for(i  = GetFirstIdxBrs(M1); i <= GetLastIdxBrs(M1); i++){
+    for(i = GetFirstIdxBrs(M1); i <= GetLastIdxBrs(M1); i++){
         for(j = GetFirstIdxKol(M2); j <= GetLastIdxKol(M2); j++){
             for(k = GetFirstIdxKol(M1); k <= GetLastIdxKol(M1); k++){
                 Elmt(M, i, j) += (Elmt(M1, i, k)*Elmt(M2, k, j));
@@ -214,16 +214,15 @@ float Determinan (MATRIKS M){
         }
     }
 
-    float temp, result = 1;
-    boolean swap;
+    float result = 1;
     int swapped = 0;
 
     while (size > 0){
-        swap = false;
+        boolean swap = false;
         i = 0;
         if (m[size-1][size-1] == 0){
-            while (i < (size-1) && !swap){
-                if (m[size-1][size-1] == 0){
+            while (i < (size-1) && (!swap)){
+                if (m[i][size-1] == 0){
                     i++;
                 } else {
                     swap = true;
@@ -234,7 +233,7 @@ float Determinan (MATRIKS M){
             return 0;
         } else if (swap){
             for(j = 0; j < size; j++){
-                temp = m[size-1][j];
+                float temp = m[size-1][j];
                 m[size-1][j] = m[i][j];
                 m[i][j] = temp;
             }
@@ -248,7 +247,8 @@ float Determinan (MATRIKS M){
         swapped = (swapped+(swap ? 1 : 0))%2;
         size--;
     }
-    return (result*(swapped==0 ? 1.0f : -1.0f));
+    float finalresult = (result*(swapped==0 ? 1.0f : -1.0f));
+    return ((finalresult < 1 && finalresult > -1) ? 0.0f : finalresult);
 }
 
 void PInverse1 (MATRIKS * M){
