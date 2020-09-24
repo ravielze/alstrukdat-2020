@@ -2,6 +2,14 @@
 #include "matriks.h"
 #include "boolean.h"
 
+/*
+NIM                 : 13519002
+Nama                : Steven Nataniel
+Tanggal             : 24 September 2020
+Topik praktikum     : Matriks
+Deskripsi           : ADT Matriks
+*/
+
 void MakeMATRIKS (int NB, int NK, MATRIKS * M){
     M->NBrsEff = NB;
     M->NKolEff = NK;
@@ -248,7 +256,7 @@ float Determinan (MATRIKS M){
         size--;
     }
     float finalresult = (result*(swapped==0 ? 1.0f : -1.0f));
-    return ((finalresult < 1 && finalresult > -1) ? 0.0f : finalresult);
+    return ((finalresult < 0.5f && finalresult > -0.5f) ? 0.0f : finalresult);
 }
 
 void PInverse1 (MATRIKS * M){
@@ -268,4 +276,66 @@ void Transpose (MATRIKS * M){
     }
 
     *M = MNew;
+}
+
+float RataBrs (MATRIKS M, indeks i){
+    int j,sum = 0, n = 0;
+    for (j = GetFirstIdxKol(M); j <= GetLastIdxKol(M); j++){
+        sum += M.Mem[i][j];
+        n++;
+    }
+    return sum/(n*1.0f);
+}
+
+float RataKol (MATRIKS M, indeks j){
+    int i,sum = 0, n = 0;
+    for (i = GetFirstIdxBrs(M); i <= GetLastIdxBrs(M); i++){
+        sum += M.Mem[i][j];
+        n++;
+    }
+    return sum/(n*1.0f);
+}
+
+void MaxMinBrs (MATRIKS M, indeks i, ElType * max, ElType * min){
+    int j;
+    *max = M.Mem[i][0];
+    *min = M.Mem[i][0];
+    for (j = GetFirstIdxKol(M); j <= GetLastIdxKol(M); j++){
+        if (Elmt(M,i,j) > *max){
+            *max = Elmt(M,i,j);
+        } else if (Elmt(M,i,j) < *min) {
+            *min = Elmt(M,i,j);
+        }
+    }
+    return;
+}
+
+void MaxMinKol (MATRIKS M, indeks j, ElType * max, ElType * min){
+    int i;
+    *max = M.Mem[0][j];
+    *min = M.Mem[0][j];
+    for (i = GetFirstIdxBrs(M); i <= GetLastIdxBrs(M); i++){
+        if (Elmt(M,i,j) > *max){
+            *max = Elmt(M,i,j);
+        } else if (Elmt(M,i,j) < *min) {
+            *min = Elmt(M,i,j);
+        }
+    }
+    return;
+}
+
+int CountXBrs (MATRIKS M, indeks i, ElType X){
+    int j, n = 0;
+    for (j = GetFirstIdxKol(M); j <= GetLastIdxKol(M); j++){
+        n += (M.Mem[i][j] == X ? 1 : 0);
+    }
+    return n;
+}
+
+int CountXKol (MATRIKS M, indeks j, ElType X){
+    int i, n = 0;
+    for (i = GetFirstIdxBrs(M); i <= GetLastIdxBrs(M); i++){
+        n += (M.Mem[i][j] == X ? 1 : 0);
+    }
+    return n;
 }
