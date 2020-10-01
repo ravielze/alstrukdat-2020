@@ -39,5 +39,5 @@ void SalinKata(){
         ADV();
         i++;
     }
-    CKata.Length = (CKata.Length < NMax) ? i : NMax;
+    CKata.Length = (i < NMax) ? i : NMax;
 }
