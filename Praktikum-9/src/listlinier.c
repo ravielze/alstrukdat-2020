@@ -8,9 +8,7 @@ boolean IsEmpty (List L){
 }
 
 void CreateEmpty (List *L){
-    List LR;
-    First(LR) = Nil;
-    *L = LR;
+    First(*L) = Nil;
 }
 
 address Alokasi (infotype X){
@@ -32,24 +30,16 @@ address Search (List L, infotype X){
     if (IsEmpty(L)) return Nil;
 
     address now = First(L);
-    if (Info(now) == X){
-        return now;
-    }
-
-    while (Next(now) != Nil){
+    while(now != Nil && Info(now)!=X){
         now = Next(now);
-        if (Info(now) == X){
-            return now;
-        }
     }
-    return Nil;
+    return now;
 }
 
 void InsVFirst (List *L, infotype X){
-    address first = First(*L);
     address newfirst = Alokasi(X);
     if (newfirst != Nil){
-        Next(newfirst) = first;
+        Next(newfirst) = First(*L);
         First(*L) = newfirst;
     }
 }
@@ -59,20 +49,18 @@ void InsVLast (List *L, infotype X){
     if (newlast == Nil) return;
 
     if (IsEmpty(*L)){
-        First(*L) = newlast;
+        InsVFirst(L, X);
     } else {
         address now = First(*L);
         while (Next(now) != Nil){
             now = Next(now);
         }
         Next(now) = newlast;
+        Next(Next(now)) = Nil;
     }
-    Next(newlast) = Nil;
 }
 
 void DelVFirst (List *L, infotype *X){
-    if (IsEmpty(*L)) return;
-
     address deleted = First(*L);
     *X = Info(deleted);
     First(*L) = Next(deleted);
@@ -81,28 +69,17 @@ void DelVFirst (List *L, infotype *X){
 }
 
 void DelVLast (List *L, infotype *X){
-    if (IsEmpty(*L)) return;
-
     address now = First(*L);
-    address last = Nil;
-    // Misal ada A -> B -> C -> D
-    // Maka D adalah now
-    // dan C adalah last
-    
-    while (Next(now) != Nil){
-        last = now; // Kedua terakhir sesuai simulasi diatas
-        now = Next(now); // Paling terakhir
+    if(Next(now) != Nil){
+        while(Next(Next(now)) != Nil){
+            now = Next(now);
+        }
+        *X = Info(Next(now));
+        Dealokasi(&Next(now));
+        Next(now) = Nil;
+    }else{
+        DelVFirst(L, X);
     }
-
-    *X = Info(now);
-    if (last == Nil){ // Kalau last nil, berarti List hanya berisi 1 elemen
-        First(*L) = Nil;
-    } else { // List berisi setidaknya 2 elemen
-        Next(last) = Nil; // Menghapus elemen terakhir dengan mengganti pointer kedua terakhir menjadi Nil
-    }
-
-    Dealokasi(&now);
-
 }
 
 void InsertFirst (List *L, address P){
@@ -114,12 +91,8 @@ void InsertFirst (List *L, address P){
 }
 
 void InsertAfter (List *L, address P, address Prec){
-    if (IsEmpty(*L)) return;
-    if (Next(Prec) == Nil) return;
-
     Next(P) = Next(Prec);
     Next(Prec) = P;
-
 }
 
 void InsertLast (List *L, address P){
@@ -144,47 +117,35 @@ void DelFirst (List *L, address *P){
 }
 
 void DelP (List *L, infotype X){
-    if (IsEmpty(*L)) return;
-
-    address deleted = Search(*L, X);
-    if (deleted != Nil){
+    if(!IsEmpty(*L)){
         address now = First(*L);
-        address before = Nil;
-        while (now != deleted){
-            before = now;
-            now = Next(now);
+        address dummy;
+        if(Info(now) == X){
+            DelFirst(L, &dummy);
+        }else{
+            while(Next(now) != Nil && Info(Next(now)) != X){
+                now = Next(now);
+            }
+            if(Next(now) != Nil){
+                DelAfter(L, &dummy, now);
+            }
         }
-
-        if (before == Nil){
-            First(*L) = Next(now);
-        } else {
-            Next(before) = Next(now);
-        }
-        
-        Dealokasi(&now);
     }
 }
 
 void DelLast (List *L, address *P){
-    if (IsEmpty(*L)) return;
-
     address now = First(*L);
-    address before = Nil;
-    while (Next(now) != Nil){
-        before = now;
-        now = Next(now);
-    }
-
-    *P = now;
-    if (before == Nil){
-        First(*L) = Nil;
-    } else {
-        Next(before) = Nil;
+    if(Next(now) == Nil){
+        DelFirst(L, P);
+    }else{
+        while(Next(Next(now)) != Nil){
+            now = Next(now);
+        }
+        DelAfter(L, P, now);
     }
 }
 
 void DelAfter (List *L, address *Pdel, address Prec){
-    if (IsEmpty(*L)) return;
 
     *Pdel = Next(Prec);
     Next(Prec) = Next(*Pdel);
@@ -244,14 +205,14 @@ void Konkat1 (List *L1, List *L2, List *L3){
     CreateEmpty(L3);
     First(*L3) = First(*L1);
     First(*L1) = Nil;
-    if (!IsEmpty(*L3)){
+    if (IsEmpty(*L3)){
+        First(*L3) = First(*L2);
+    } else {
         address now = First(*L3);
         while (Next(now) != Nil){
             now = Next(now);
         }
         Next(now) = First(*L2);
-    } else {
-        First(*L3) = First(*L2);
     }
     First(*L2) = Nil;
 }
