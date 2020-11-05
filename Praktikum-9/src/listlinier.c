@@ -216,3 +216,149 @@ void Konkat1 (List *L1, List *L2, List *L3){
     }
     First(*L2) = Nil;
 }
+
+boolean FSearch (List L, address P){
+    address now = First(L);
+    while (now != Nil){
+        if (P == now){
+            return true;
+        }
+        now = Next(now);
+    }
+    return false;
+}
+
+address SearchPrec (List L, infotype X){
+    address s = Search(L, X);
+    if (s != Nil){
+        address P = First(L);
+        while (P != Nil){
+            if (Next(P) == s){
+                return P;
+            }
+            P = Next(P);
+        }
+    }
+    return Nil;
+}
+address AdrMax (List L){
+	return Search(L,Max(L));
+}
+
+address AdrMin (List L){
+	return Search(L,Min(L));
+}
+
+float Average (List L){
+	if (IsEmpty(L)){
+		return 0;
+	} else {
+		address P = First(L);
+		float total = Info(P);
+		float count = 1;
+		while (Next(P) != Nil){
+			P = Next(P);
+			total = total + Info(P);
+			count++;
+		}
+		return (total/count);
+	} 
+}
+
+void DelAll (List *L){
+    address pembuangan;
+    address now = First(*L);
+    while (now != Nil){
+        DelFirst(L, &pembuangan);
+        now = Next(now);
+    }
+    First(*L) = Nil;
+}
+
+void InversList (List *L){
+	if (!IsEmpty(*L)){
+		address P = First(*L);
+		while (Next(P) != Nil){
+			P = Next(P);
+		}
+		address last = P;
+		address Prec;
+		while (P != First(*L)){
+			Prec = First(*L);
+			while (Next(Prec) != P){
+				Prec = Next(Prec);
+			}
+			Next(P) = Prec;
+			P = Next(P);
+		}
+		Next(P) = Nil;
+		First(*L) = last;
+	}
+}
+
+void CopyList (List *L1, List *L2){
+    First(*L2) = First(*L1);
+}
+
+List FCopyList (List L){
+    List new;
+    CreateEmpty(&new);
+
+    boolean fail = false;
+    address P = First(L);
+    while (!fail && P != Nil){
+        address c = Alokasi(Info(P));
+        if (c == Nil){
+            fail = true;
+        } else {
+            InsertLast(&new, c);
+        }
+        P = Next(P);
+    }
+    if (fail){
+        DelAll(&new);
+    }
+    return new;
+}
+
+List FInversList (List L){
+    List new = FCopyList(L);
+    InversList(&new);
+    return new;
+}
+
+void CpAlokList (List Lin, List *Lout){
+    *Lout = FCopyList(Lin);
+}
+
+void PecahList (List *L1, List *L2, List L){
+    CreateEmpty(L1);
+    CreateEmpty(L2);
+    int half = NbElmt(L)/2;
+    int count = 0;
+    address now = First(L);
+    while (now != Nil){
+        count++;
+        address ins = Alokasi(Info(now));
+        if (ins != Nil){
+            if (count <= half){
+                InsertLast(L1, ins);
+            } else {
+                InsertLast(L2, ins);
+            }
+        }
+        now = Next(now);
+    }
+
+}
+
+void Konkat (List L1, List L2, List * L3){
+    CreateEmpty(L3);
+    List L1new = FCopyList(L1);
+    List L2new = FCopyList(L2);
+    if (NbElmt(L1new) != NbElmt(L1) || NbElmt(L2new) != NbElmt(L2)){
+        return;
+    } else {
+        Konkat1(&L1new, &L2new, L3);
+    }
+}
