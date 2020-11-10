@@ -89,24 +89,24 @@ void DelVLast (List *L, infotype *X){
 
 void InsertFirst (List *L, address P){
     address newfirst = P;
-    if (newfirst != Nil){
-        if (IsEmpty(*L)){
-            First(*L) = newfirst;
-        }
-        First(*L) = newfirst;
-        Next(newfirst) = First(*L);
+    if (First(*L) == Nil){
+        Last(*L) = newfirst;
+    } else {
+        Prev(First(*L)) = newfirst;
     }
+    Next(newfirst) = First(*L);
+    First(*L) = newfirst;
 }
 
 void InsertLast (List *L, address P){
     address newlast = P;
-    if (newlast != Nil){
-        if (IsEmpty(*L)){
-            Last(*L) = newlast;
-        }
-        Last(*L) = newlast;
-        Prev(newlast) = Last(*L);
+    if (Last(*L) == Nil){
+        First(*L) = newlast;
+    } else {
+        Next(Last(*L)) = newlast;
     }
+    Prev(newlast) = Last(*L);
+    Last(*L) = newlast;
 }
 
 void InsertAfter (List *L, address P, address Prec){
@@ -179,11 +179,9 @@ void DelP (List *L, infotype X){
 
 void DelBefore (List *L, address *Pdel, address Succ){
     *Pdel = Prev(Succ);
-    if ((*Pdel) == First(*L)){
-        DelFirst(L, (*Pdel));
-    } else if ((*Pdel) == Last(*L)){
-        DelLast(L, Pdel);
-    } else {
+    if(*Pdel == First(*L)){
+        DelFirst(L, Pdel);
+    }else{
         DelAfter(L, Pdel, Prev(*Pdel));
     }
 }
