@@ -154,7 +154,7 @@ void DelLast (List *L, address *P){
 void DelAfter (List *L, address *Pdel, address Prec){
     *Pdel = Next(Prec);
     if ((*Pdel) == First(*L)){
-        DelFirst(L, (*Pdel));
+        DelFirst(L, Pdel);
     } else if ((*Pdel) == Last(*L)){
         DelLast(L, Pdel);
     } else {
@@ -167,7 +167,7 @@ void DelP (List *L, infotype X){
     address cari = Search(*L, X);
     if (cari != Nil){
         if (cari == First(*L)){
-            DelFirst(L, cari);
+            DelFirst(L, &cari);
         } else if (cari == Last(*L)){
             DelLast(L, &cari);
         } else {
