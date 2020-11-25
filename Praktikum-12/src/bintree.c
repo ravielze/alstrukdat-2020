@@ -24,7 +24,7 @@ BinTree BuildBalanceTree(int n){
         BinTree P = AlokNode(X);
         if (P != Nil){
             int nL = n/2;
-            int nR = n-nL-1;
+            int nR = (n-1)/2;
             BinTree L = BuildBalanceTree(nL);
             BinTree R = BuildBalanceTree(nR);
             Left(P) = L;
@@ -246,20 +246,16 @@ void DelDaunTerkiri(BinTree *P, infotype *X){
 }
 
 void DelDaun(BinTree *P, infotype X){
-    if (IsTreeOneElmt(*P) && Akar(*P) == X){
-        BinTree N = *P;
-        *P = Nil;
-        DealokNode(N);
-    } else if (IsUnerRight(*P)){
-        DelDaun(&(Right(*P)), X);
-    } else if (IsUnerLeft(*P)){
-        DelDaun(&(Left(*P)), X);
-    } else {
-        if (SearchDaun(Left(*P), X)){
-            DelDaun(&(Left(*P)), X);
-        }
-        if (SearchDaun(Right(*P), X)){
-            DelDaun(&(Right(*P)), X);
+    if(!IsTreeEmpty(*P)){
+        if(IsTreeOneElmt(*P)){
+            if(Akar(*P)==X){
+                addrNode Q = *P;
+                *P = Nil;
+                DealokNode(Q);
+            }
+        }else{
+            DelDaun(&Left(*P), X);
+            DelDaun(&Right(*P), X);
         }
     }
 }
@@ -282,16 +278,12 @@ List MakeListPreorder(BinTree P){
 List MakeListLevel(BinTree P, int N){
     if (IsTreeEmpty(P)){
         return Nil;
+    } else if (N < 1){
+        return Nil;
     } else if (N == 1){
         return Alokasi(Akar(P));
     } else {
-        address E = Alokasi(Akar(P));
-        if (E != Nil){
-            Next(E) = MakeListLevel(Left(P), N-1);
-            return Concat(E, MakeListLevel(Right(P), N-1));
-        } else {
-            return Nil;
-        }
+        return Concat(MakeListLevel(Left(P), N-1), MakeListLevel(Right(P), N-1));
     }
 }
 
