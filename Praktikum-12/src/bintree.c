@@ -16,21 +16,15 @@ void MakeTree(infotype Akar, BinTree L, BinTree R, BinTree *P){
 }
 
 BinTree BuildBalanceTree(int n){
-    if (n==0){
+    int akar;
+    BinTree L,R;
+    if(n == 0) {
         return Nil;
     } else {
-        int X;
-        scanf("%d", &X);
-        BinTree P = AlokNode(X);
-        if (P != Nil){
-            int nL = n/2;
-            int nR = (n-1)/2;
-            BinTree L = BuildBalanceTree(nL);
-            BinTree R = BuildBalanceTree(nR);
-            Left(P) = L;
-            Left(P) = R;
-        }
-        return P;
+        scanf("%d",&akar);
+        L = BuildBalanceTree(n/2);
+        R = BuildBalanceTree(n-(n/2)-1);
+        return Tree(akar, L, R);
     }
 }
 
@@ -140,11 +134,22 @@ boolean SearchTree(BinTree P, infotype X){
     }
 }
 
-boolean SearchDaun(BinTree P, infotype X){
-    if (IsTreeOneElmt(P)){
-        return Akar(P) == X;
-    } else {
-        return SearchDaun(Left(P), X) || SearchDaun(Right(P), X);
+addrNode SearchDaun(BinTree P, infotype X){
+    if(IsTreeEmpty(P)){
+        return Nil;
+    }else if(IsTreeOneElmt(P)){
+        if(Akar(P)==X){
+            return P;
+        }else{
+            return Nil;
+        }
+    }else{
+        addrNode ret = SearchDaun(Left(P), X);
+        if(ret != Nil){
+            return ret;
+        }else{
+            return SearchDaun(Right(P), X);
+        }
     }
 }
 
@@ -169,11 +174,23 @@ int NbDaun(BinTree P){
 }
 
 boolean IsSkewLeft(BinTree P){
-    return Tinggi(Left(P)) > Tinggi(Right(P));
+    if(IsTreeEmpty(P)){
+        return true;
+    }else if(IsTreeOneElmt(P)){
+        return true;
+    }else{
+        return IsUnerLeft(P) && IsSkewLeft(Left(P));
+    }
 }
 
 boolean IsSkewRight(BinTree P){
-    return Tinggi(Left(P)) < Tinggi(Right(P));
+    if(IsTreeEmpty(P)){
+        return true;
+    }else if(IsTreeOneElmt(P)){
+        return true;
+    }else{
+        return IsUnerRight(P) && IsSkewRight(Right(P));
+    }
 }
 
 int Level(BinTree P, infotype X){
@@ -213,22 +230,11 @@ void AddDaunTerkiri(BinTree *P, infotype X){
 }
 
 void AddDaun(BinTree *P, infotype X, infotype Y, boolean Kiri){
-    if (IsTreeOneElmt(*P) && Akar(*P) == X){
-        if (Kiri){
-            Left(*P) = AlokNode(Y);
-        } else {
-            Right(*P) = AlokNode(Y);
-        }
-    } else if (IsUnerRight(*P)){
-        AddDaun(&(Right(*P)), X, Y, Kiri);
-    } else if (IsUnerLeft(*P)){
-        AddDaun(&(Left(*P)), X, Y, Kiri);
-    } else {
-        if (SearchDaun(Left(*P), X)){
-            AddDaun(&(Left(*P)), X, Y, Kiri);
-        } else {
-            AddDaun(&(Right(*P)), X, Y, Kiri);
-        }
+    addrNode Q = SearchDaun(*P, X);
+    if(Kiri){
+        Left(Q) = AlokNode(Y);
+    }else{
+        Right(Q) = AlokNode(Y);
     }
 }
 
