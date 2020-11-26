@@ -207,6 +207,7 @@ int Level(BinTree P, infotype X){
     } else if (IsUnerRight(P)){
         return 1+Level(Right(P), X);
     }
+    return 1;
 }
 
 int Tinggi(BinTree P){
